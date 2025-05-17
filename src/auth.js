@@ -13,3 +13,10 @@ const verifyApiKey = (token) => {
 };
 
 module.exports = { generateApiKey, verifyApiKey };
+
+const UserSchema = new mongoose.Schema({
+  email: String,
+  apiKey: String,
+  lastRegen: Date,
+  regenInterval: { type: Number, default: 30 }, // Seconds
+});
