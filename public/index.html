@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexAPI - One Key, Endless APIs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #1e3a8a, #f97316); }
+    .sidebar { transition: transform 0.3s ease-in-out; }
+    .sidebar-hidden { transform: translateX(-100%); }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800">
+  <nav class="bg-white shadow-lg p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+      <img src="assets/logo.png" alt="NexAPI Logo" class="h-10">
+      <h1 class="text-2xl font-bold text-blue-900">NexAPI</h1>
+    </div>
+    <div class="space-x-4">
+      <a href="#dashboard" class="text-blue-600 hover:text-orange-500">Dashboard</a>
+      <a href="#verse" class="text-blue-600 hover:text-orange-500">NexAPI Verse</a>
+      <a href="#builder" class="text-blue-600 hover:text-orange-500">API Builder</a>
+      <button id="logout" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Logout</button>
+    </div>
+  </nav>
+  <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg p-6 sidebar sidebar-hidden">
+    <button id="close-sidebar" class="text-gray-600 mb-4">✕</button>
+    <h2 class="text-xl font-semibold text-blue-900 mb-4">Menu</h2>
+    <ul class="space-y-2">
+      <li><a href="#dashboard" class="text-blue-600 hover:text-orange-500">Dashboard</a></li>
+      <li><a href="#verse" class="text-blue-600 hover:text-orange-500">NexAPI Verse</a></li>
+      <li><a href="#test-keys" class="text-blue-600 hover:text-orange-500">Test Keys</a></li>
+      <li><a href="#builder" class="text-blue-600 hover:text-orange-500">API Builder</a></li>
+    </ul>
+  </aside>
+  <main class="container mx-auto p-6">
+    <section id="api-key" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-blue-900 mb-4">Universal API Key</h2>
+      <p class="text-gray-600 mb-4">Your single, secure token for all APIs. Regenerates every 30 seconds.</p>
+      <div class="flex items-center space-x-4">
+        <input id="email-input" type="email" placeholder="Enter your email" class="border rounded p-2 w-full">
+        <button id="get-key" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-orange-500">Get Key</button>
+      </div>
+      <div id="key-output" class="mt-4 p-4 bg-gray-100 rounded hidden">
+        <p><strong>Your API Key:</strong> <span id="api-key-value"></span></p>
+        <p><strong>Expires At:</strong> <span id="expires-at"></span></p>
+        <button id="copy-key" class="mt-2 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Copy Key</button>
+      </div>
+    </section>
+    <section id="dashboard" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-blue-900 mb-4">Management Dashboard</h2>
+      <p class="text-gray-600 mb-4">Real-time insights into API usage, performance, and costs.</p>
+      <div id="dashboard-metrics" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      <div id="suggestions" class="mt-4 p-4 bg-gray-100 rounded">
+        <h3 class="font-semibold text-blue-900">AI Suggestions</h3>
+        <ul id="suggestions-list" class="list-disc pl-5"></ul>
+      </div>
+    </section>
+    <section id="verse" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-blue-900 mb-4">NexAPI Verse</h2>
+      <p class="text-gray-600 mb-4">Discover vetted APIs with reviews and interactive testing.</p>
+      <div class="flex space-x-4 mb-4">
+        <input id="verse-filter" type="text" placeholder="Filter by auth type or performance" class="border rounded p-2 w-full">
+        <button id="search-verse" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-orange-500">Search</button>
+      </div>
+      <div id="verse-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+    <section id="test-keys" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-blue-900 mb-4">Secure Test Keys & Sandboxes</h2>
+      <p class="text-gray-600 mb-4">Generate temporary keys for safe experimentation.</p>
+      <div class="flex space-x-4 mb-4">
+        <input id="test-key-api" type="text" placeholder="Enter main API key" class="border rounded p-2 w-full">
+        <button id="generate-test-key" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-orange-500">Generate Test Key</button>
+      </div>
+      <div id="test-key-output" class="mt-4 p-4 bg-gray-100 rounded hidden">
+        <p><strong>Test Key:</strong> <span id="test-key-value"></span></p>
+        <p><strong>Sandbox ID:</strong> <span id="sandbox-id"></span></p>
+      </div>
+    </section>
+    <section id="builder" class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-blue-900 mb-4">API Builder</h2>
+      <p class="text-gray-600 mb-4">Create custom APIs from prompts in seconds.</p>
+      <div class="flex space-x-4 mb-4">
+        <input id="builder-prompt" type="text" placeholder="e.g., Create an API to fetch weather data" class="border rounded p-2 w-full">
+        <button id="generate-api" class="bg-blue-900 text-white px-4 py-2 rounded hover:bg-orange-500">Generate API</button>
+      </div>
+      <div id="builder-output" class="mt-4 p-4 bg-gray-100 rounded hidden">
+        <p><strong>Endpoint:</strong> <span id="api-endpoint"></span></p>
+        <p><strong>API Key:</strong> <span id="api-key-generated"></span></p>
+        <p><strong>Sandbox ID:</strong> <span id="sandbox-id-generated"></span></p>
+      </div>
+    </section>
+  </main>
+  <footer class="bg-blue-900 text-white p-4 text-center">
+    <p>© 2025 NexAPI AS. All rights reserved.</p>
+    <p><a href="https://nexapi-core-verse-landing.replit.app" class="underline">Join our beta</a></p>
+  </footer>
+  <script>
+    const API_BASE_URL = '';
+    document.getElementById('close-sidebar').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('sidebar-hidden');
+    });
+    document.getElementById('get-key').addEventListener('click', async () => {
+      const email = document.getElementById('email-input').value;
+      if (!email) return alert('Please enter an email');
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/key?email=${email}`);
+        const data = await response.json();
+        document.getElementById('api-key-value').textContent = data.apiKey;
+        document.getElementById('expires-at').textContent = new Date(data.expiresAt).toLocaleString();
+        document.getElementById('key-output').classList.remove('hidden');
+      } catch (error) {
+        alert('Error fetching API key');
+      }
+    });
+    document.getElementById('copy-key').addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('api-key-value').textContent);
+      alert('API Key copied!');
+    });
+    async function loadDashboard() {
+      const apiKey = document.getElementById('api-key-value').textContent || 'sample-key';
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/dashboard/${apiKey}`);
+        const data = await response.json();
+        const metricsDiv = document.getElementById('dashboard-metrics');
+        metricsDiv.innerHTML = `
+          <div class="p-4 bg-blue-100 rounded">
+            <h3 class="font-semibold">Requests</h3>
+            <p>${data.metrics[0]?.requests || 0}</p>
+          </div>
+          <div class="p-4 bg-blue-100 rounded">
+            <h3 class="font-semibold">Latency</h3>
+            <p>${data.metrics[0]?.latency || 0}ms</p>
+          </div>
+          <div class="p-4 bg-blue-100 rounded">
+            <h3 class="font-semibold">Errors</h3>
+            <p>${data.metrics[0]?.errors || 0}</p>
+          </div>
+        `;
+        const suggestionsList = document.getElementById('suggestions-list');
+        suggestionsList.innerHTML = data.suggestions.map(s => `<li>${s}</li>`).join('');
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+      }
+    }
+    document.getElementById('search-verse').addEventListener('click', async () => {
+      const filter = document.getElementById('verse-filter').value;
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/verse?authType=${filter}`);
+        const data = await response.json();
+        const verseList = document.getElementById('verse-list');
+        verseList.innerHTML = data.map(api => `
+          <div class="p-4 bg-blue-100 rounded">
+            <h3 class="font-semibold">${api.name}</h3>
+            <p>Provider: ${api.provider}</p>
+            <p>Auth: ${api.authType}</p>
+            <p>Performance: ${api.performance}</p>
+            <button class="mt-2 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">Test API</button>
+          </div>
+        `).join('');
+      } catch (error) {
+        alert('Error fetching APIs');
+      }
+    });
+    document.getElementById('generate-test-key').addEventListener('click', async () => {
+      const apiKey = document.getElementById('test-key-api').value;
+      if (!apiKey) return alert('Please enter an API key');
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/test-key`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey, duration: 3600, usageLimit: 100 }),
+        });
+        const data = await response.json();
+        document.getElementById('test-key-value').textContent = data.testKey;
+        document.getElementById('sandbox-id').textContent = data.sandboxId;
+        document.getElementById('test-key-output').classList.remove('hidden');
+      } catch (error) {
+        alert('Error generating test key');
+      }
+    });
+    document.getElementById('generate-api').addEventListener('click', async () => {
+      const prompt = document.getElementById('builder-prompt').value;
+      if (!prompt) return alert('Please enter a prompt');
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/builder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await response.json();
+        document.getElementById('api-endpoint').textContent = data.endpoint;
+        document.getElementById('api-key-generated').textContent = data.apiKey;
+        document.getElementById('sandbox-id-generated').textContent = data.sandboxId;
+        document.getElementById('builder-output').classList.remove('hidden');
+      } catch (error) {
+        alert('Error generating API');
+      }
+    });
+    loadDashboard();
+  </script>
+</body>
+</html>
